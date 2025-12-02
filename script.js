@@ -46,3 +46,55 @@ btn.addEventListener ('click', (event) => {
 
     .finally(() => event.target.remove());
 });
+
+inputCountry.addEventListener ("keypress", function (event) {
+    if (event.key === "Enter") {
+        const countryName = inputCountry.value.trim();
+    if (countryName === "") {
+        inputCountry.value ="";
+        inputCountry.placeholder ="Digite o nome de um país !"
+    }
+        fetchCountry(countryName);
+    }
+});
+
+function showCountry(country) {
+    const languages = country.languages
+    ?Object.values(country.languages).join(", ") : "Não informado";
+
+    const borders = country.borders?.length
+    ?country.borders.join(", ") : "Não informada(s)";
+
+    const map = country.maps?.googleMaps || "Mapa não disponível"
+    countriesContainer.innerHTML = `
+
+        <div class="country-card">
+            <h2>${country.name.common}</h2>
+            <img src="${country.flags.png}" alt="">
+            <p><strong>Nome Oficial = </strong>${country.name.official}</p>
+            <p><strong>Capital = </strong> ${country.capital}</p>
+            <p><strong>Região = </strong> ${country.region}</p>
+            <p><strong>População = </strong> ${country.population.toLocaleString('pt-BR')}</p>
+            <p><strong>Área = </strong>${country.area.toLocaleString('pt-BR')} km²</p>
+            <p><strong>Idiomas = </strong>${languages}</p>
+            <p><strong>Fronteira(s) = </strong>${borders}</p>
+            <p><strong>Localização = </strong><a class="map-btn" href="${map}" target="_blank">Ver mapa</a></p>
+        </div>
+    `;
+}
+
+function fetchCountry(name) {
+    const url = `https://restcountries.com/v3.1/name/${name}`;
+
+fetch(url)
+    .then (response => {
+        if (!response.ok) {
+            inputCountry.value = "";
+            inputCountry.placeholder = "País não encontrado/Inexistente";
+        }
+        return response.json();
+})
+    .then(data => {
+        showCountry(data[0]);
+})
+};
