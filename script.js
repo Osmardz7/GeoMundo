@@ -1,8 +1,10 @@
 const btn = document.querySelector('button');
 const countries = document.querySelector('#countries');
-const countriesUrl = 'https://restcountries.com/v3.1/all?fields=flags,name,officialname,capital,region,population,area,languages,borders,maps';
+const countriesUrl = 'https://restcountries.com/v3.1/all?fields=flags,name,capital,region,population,area,languages,currencies,borders,maps';
 const inputCountry = document.getElementById("searchInput");
 const countriesContainer = document.getElementById("countries");
+const regionFilter = document.getElementById("regionFilter");
+let regionCountries = [];
 
 function generateHTML(data) {
     let html = '';
@@ -10,7 +12,10 @@ function generateHTML(data) {
         const languages = country.languages
         ?Object.values(country.languages).join(", ") : "Não informado";
 
-        const borders = country.borders?.lenght
+        const currencies = country.currencies
+        ? Object.values(country.currencies).map (c => `${c.name} (${c.symbol})`).join(", "): "Não informado";
+
+        const borders = country.borders?.length
         ?country.borders.join(", ") : "Não informada(s)";
 
         const map = country.maps?.googleMaps || "Mapa não disponível"
@@ -24,27 +29,42 @@ function generateHTML(data) {
             <p><strong>População = </strong>${country.population.toLocaleString('pt-BR')}</p>
             <p><strong>Área = </strong>${country.area.toLocaleString('pt-BR')} km²</p>
             <p><strong>Idiomas = </strong>${languages}</p>
+            <p><strong>Moeda = </strong>${currencies}</p>
             <p><strong>Fronteira(s) = </strong>${borders}</p>
             <p><strong>Localização = </strong><a class="map-btn" href="${map}" target="_blank">Ver mapa</a></p>
         </div>
         `;
     })
-    
     countries.innerHTML = html;
 }
 
+regionFilter.addEventListener("change", () => {
+    const selected = regionFilter.value;
+
+    if (selected === "") {
+        generateHTML(regionCountries);
+        return;
+    }
+    const filtered = regionCountries.filter(
+        country => country.region === selected
+    );
+    generateHTML(filtered);
+});
+
 btn.addEventListener ('click', (event) => {
-    event.target.textContent = 'Aguarde ...';
+    event.target.innerHTML = '<div class="loader"></div>';
 
     fetch (countriesUrl)
     .then (response => response.json())
-    .then (generateHTML)
+    .then(data => {
+        regionCountries = data;
+        generateHTML(data);
+    })
     .catch (err => {
         countries.innerHTML = '<h3>Erro ao mostrar dados</h3>';
         console.log(err);
     })
-
-    .finally(() => event.target.remove());
+    .finally(() => btn.remove());
 });
 
 inputCountry.addEventListener ("keypress", function (event) {
