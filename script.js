@@ -1,0 +1,48 @@
+const btn = document.querySelector('button');
+const countries = document.querySelector('#countries');
+const countriesUrl = 'https://restcountries.com/v3.1/all?fields=flags,name,officialname,capital,region,population,area,languages,borders,maps';
+const inputCountry = document.getElementById("searchInput");
+const countriesContainer = document.getElementById("countries");
+
+function generateHTML(data) {
+    let html = '';
+    data.map (country => {
+        const languages = country.languages
+        ?Object.values(country.languages).join(", ") : "Não informado";
+
+        const borders = country.borders?.lenght
+        ?country.borders.join(", ") : "Não informada(s)";
+
+        const map = country.maps?.googleMaps || "Mapa não disponível"
+        html += `
+        <div>
+            <h2>${country.name.common}</h2>
+            <img src="${country.flags.png}" alt="">
+            <p><strong>Nome Oficial = </strong>${country.name.official}</p>
+            <p><strong>Capital = </strong>${country.capital}</p>
+            <p><strong>Região = </strong>${country.region}</p>
+            <p><strong>População = </strong>${country.population.toLocaleString('pt-BR')}</p>
+            <p><strong>Área = </strong>${country.area.toLocaleString('pt-BR')} km²</p>
+            <p><strong>Idiomas = </strong>${languages}</p>
+            <p><strong>Fronteira(s) = </strong>${borders}</p>
+            <p><strong>Localização = </strong><a class="map-btn" href="${map}" target="_blank">Ver mapa</a></p>
+        </div>
+        `;
+    })
+    
+    countries.innerHTML = html;
+}
+
+btn.addEventListener ('click', (event) => {
+    event.target.textContent = 'Aguarde ...';
+
+    fetch (countriesUrl)
+    .then (response => response.json())
+    .then (generateHTML)
+    .catch (err => {
+        countries.innerHTML = '<h3>Erro ao mostrar dados</h3>';
+        console.log(err);
+    })
+
+    .finally(() => event.target.remove());
+});
