@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search"/>
     <title>GeoMundo</title>
-    <title>Barra de pesquisa</title>
     <link rel="stylesheet" href="main.css">
-    <script src="./script.js" defer></script>
     <style>
       li {
         padding: 0.6em;
@@ -35,9 +33,20 @@
          <span class="material-symbols-outlined">search</span>
        </label>
        <input type="text" id="searchInput" placeholder="Pesquisar">
+       <div class="filter-container">
+           <select id="regionFilter">
+            <option value="" disabled selected hidden>Filtrar</option>
+            <option value="">Todos os Países</option>
+            <option value="Africa">África</option>
+            <option value="Americas">Américas</option>
+            <option value="Asia">Ásia</option>
+            <option value="Europe">Europa</option>
+            <option value="Oceania">Oceania</option>
+           </select>
+       </div>
       </div>
       <button>
-        <h3>Ver Todos os Países</h3>
+        <h3>Ver Países</h3>
       </button>
     </header>
 <body>
